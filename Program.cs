@@ -92,7 +92,7 @@ namespace CreateWordDocument
                 }
             };
             IronExcel ironExcel = new IronExcel();
-            var result2=ironExcel.ReadStyleSheet(iDictionary,$@"{processInfo.FolderPath}/{processInfo.ExcelName}.xlsx");
+            var result=ironExcel.ReadStyleSheet(iDictionary,$@"{processInfo.FolderPath}/{processInfo.ExcelName}.xlsx");
             ReadTextFile textFile = new ReadTextFile();
             var bodyWins = textFile.ReadText($@"{processInfo.FolderPath}/{processInfo.TextWinsName}.txt");
             var bodyPart = textFile.ReadText($@"{processInfo.FolderPath}/{processInfo.TextParticipantsName}.txt");
