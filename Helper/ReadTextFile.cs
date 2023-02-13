@@ -11,7 +11,7 @@ namespace CreateWordDocument.Helper
                 // Store each line in array of strings
                 string[] lines = File.ReadAllLines(textPath);
 
-                foreach (string ln in lines)
+                foreach (var ln in lines)
                 {
                     if (string.IsNullOrEmpty(result))
                     {

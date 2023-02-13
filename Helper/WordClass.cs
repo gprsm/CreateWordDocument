@@ -7,11 +7,8 @@ namespace CreateWordDocument.Helper
     {
         public void FindAndReplace(string path,string textToR,string replace,string resPath)
         {
-            bool result = IronXL.License.IsValidLicense("IRONXL-BOARD4ALL.BIZ-476050-D561CA1-6FF16253D-506F87-NEx-JJN");
-            if (result)
-            {
-                throw new Exception();
-            }
+            
+           
             object oMissing = System.Reflection.Missing.Value;
             Application fileOpen = new Application();   
             //Open a already existing word file into the new document created

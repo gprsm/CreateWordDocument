@@ -80,7 +80,9 @@ namespace CreateWordDocument
             };
             IronExcel ironExcel = new IronExcel();
             var result=ironExcel.ReadStyleSheet(iDictionary,excelPath);
-            
+            ReadTextFile textFile = new ReadTextFile();
+            var bodyWins = textFile.ReadText($@"{textWinsPath}");
+            var bodyPart = textFile.ReadText($@"{textParticipantsPath}");
             WordClass wordClass = new WordClass();
             string documentFolder= @"C:\Users\mohse\Desktop\New_folder\{0}";
             wordClass.FindAndReplace(string.Format(documentFolder,"Template1.docx"),"family","احمد نصیری",string.Format(documentFolder,"TemplateResult.docx"));
