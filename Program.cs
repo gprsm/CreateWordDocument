@@ -1,9 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CreateWordDocument.Helper;
 using CreateWordDocument.Models;
 using DocumentFormat.OpenXml.Packaging;
@@ -16,8 +13,10 @@ namespace CreateWordDocument
         static void Main(string[] args)
         {
             Console.WriteLine("Init...");
-            CollectInfo info = new CollectInfo();
-            var excelPath=info.InteractWithUser("Enter Excel FilePath...");
+            var info = new CollectInfo();
+            var folderPath=info.InteractWithUser("Enter folder of FilesPath(excel and word template)...");
+            var excelName=info.InteractWithUser("Enter Excel file name...");
+            var wordTemplateName=info.InteractWithUser("Enter word template file name...");
             var nameColumnNumber=int.Parse(info.InteractWithUser("Enter number of Name Column..."));
             var nameCharInTemplate=info.InteractWithUser("Enter Character of Name string...");
             var familyColumnNumber=int.Parse(info.InteractWithUser("Enter number of family Column..."));
@@ -32,8 +31,8 @@ namespace CreateWordDocument
             var scoreCharInTemplate=info.InteractWithUser("Enter Character of Score string...");
             var signatureColumnNumber=int.Parse(info.InteractWithUser("Enter number of Signature Column..."));
             var signatureCharInTemplate=info.InteractWithUser("Enter Character of Signature string...");
-            var textWinsPath=info.InteractWithUser("Enter Text boy for wins FilePath...");
-            var textParticipantsPath=info.InteractWithUser("Enter Text boy for Participants FilePath...");
+            var textWinsName=info.InteractWithUser("Enter Text boy for wins File Name...");
+            var textParticipantsName=info.InteractWithUser("Enter Text boy for Participants File Name...");
             var textCharInTemplate=info.InteractWithUser("Enter Character of text string...");
             
             var iDictionary = new Dictionary<int, PositionAndTypeModel>
@@ -79,10 +78,10 @@ namespace CreateWordDocument
                 } }
             };
             IronExcel ironExcel = new IronExcel();
-            var result=ironExcel.ReadStyleSheet(iDictionary,excelPath);
+            var result=ironExcel.ReadStyleSheet(iDictionary,$@"{folderPath}/{excelName}.xlsx");
             ReadTextFile textFile = new ReadTextFile();
-            var bodyWins = textFile.ReadText($@"{textWinsPath}");
-            var bodyPart = textFile.ReadText($@"{textParticipantsPath}");
+            var bodyWins = textFile.ReadText($@"{folderPath}/{textWinsName}.txt");
+            var bodyPart = textFile.ReadText($@"{folderPath}/{textParticipantsName}.txt");
             WordClass wordClass = new WordClass();
             string documentFolder= @"C:\Users\mohse\Desktop\New_folder\{0}";
             wordClass.FindAndReplace(string.Format(documentFolder,"Template1.docx"),"family","احمد نصیری",string.Format(documentFolder,"TemplateResult.docx"));

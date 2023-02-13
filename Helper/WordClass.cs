@@ -1,10 +1,31 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using CreateWordDocument.Models;
 using Microsoft.Office.Interop.Word;
 
 namespace CreateWordDocument.Helper
 {
     public class WordClass
     {
+        public void ProcessInputs(List<ExcelModel> excelInputs, string templatePath, string textWins,
+            string textPar)
+        {
+            if (!File.Exists(templatePath))
+            {
+                var info = new CollectInfo();
+                templatePath=info.InteractWithUser("template not Found. enter full word file path again(example 'c:/template.docx')...");
+            }
+            object oMissing = System.Reflection.Missing.Value;
+            Application fileOpen = new Application();
+            Document document = fileOpen.Documents.Open(templatePath,ReadOnly:false);
+            //Make the file visible 
+            fileOpen.Visible = false;
+            foreach (var excelInput in excelInputs)
+            {
+                
+            }
+        }
         public void FindAndReplace(string path,string textToR,string replace,string resPath)
         {
             
