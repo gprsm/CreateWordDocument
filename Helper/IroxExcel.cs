@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CreateWordDocument.Models;
@@ -18,91 +19,105 @@ namespace CreateWordDocument.Helper
             var resultList = new List<ExcelModel>();
             WorkBook workBook = WorkBook.Load(xmlPath);
             WorkSheet workSheet = workBook.WorkSheets.First();
-            foreach (var info in columnsInfo)
+            
+            foreach (var sheetRow in workSheet.Rows)
             {
-                foreach (var totalRow in workSheet.Rows)
+                var excel = new ExcelModel()
                 {
-                    var excelModel = new ExcelModel()
+                    Text = new DefinedValue<string>(),
+                    Company = new DefinedValue<string>(),
+                    Family = new DefinedValue<string>(),    
+                    Gender = new DefinedValue<PersonTypeNum.Gender>(),
+                    Name = new DefinedValue<string>(),
+                    Score = new DefinedValue<string>(),
+                    PersonType = new DefinedValue<PersonTypeNum.PersonType>(),
+                    Signature = new DefinedValue<string>()
+                };
+                foreach (var model in columnsInfo)
+                {
+                    var cellInfo = sheetRow.FirstOrDefault(x => x.ColumnIndex == model.Key);
+                    if (cellInfo?.Value!=null)
                     {
-                        Text = new DefinedValue<string>(),
-                        Company = new DefinedValue<string>(),
-                        Family = new DefinedValue<string>(),
-                        Gender = new DefinedValue<PersonTypeNum.Gender>(),
-                        Name = new DefinedValue<string>(),
-                        Score = new DefinedValue<string>(),
-                        PersonType = new DefinedValue<PersonTypeNum.PersonType>(),
-                        Signature = new DefinedValue<string>()
-                    };
-                    foreach (var cell in 
-                             totalRow.ToList().Where(cell => 
-                                 !string.IsNullOrEmpty(cell.Text)).
-                                 Where(cell => cell.ColumnIndex==info.Key))
-                    {
-                        switch (info.Value.ColumnType)
+                        switch (model.Value.ColumnType)
                         {
                             case PersonTypeNum.ColumnType.Name:
                             {
-                                excelModel.Name.PositionString = info.Value.PositionString;
-                                excelModel.Name.Value = cell.Value.ToString();
+                                excel.Name.PositionString = model.Value.PositionString;
+                                excel.Name.Value = cellInfo.Value.ToString();
                                 break;
                             }
                             case PersonTypeNum.ColumnType.Family:
                             {
-                                excelModel.Family.PositionString = info.Value.PositionString;
-                                excelModel.Family.Value = cell.Value.ToString();
+                                excel.Family.PositionString = model.Value.PositionString;
+                                excel.Family.Value = cellInfo.Value.ToString();
                                 break;
                             }
                             case PersonTypeNum.ColumnType.PersonType:
                             {
-                                var personType=(int)cell.Value==(int)PersonTypeNum.PersonType.Family?PersonTypeNum.PersonType.Family:
+                                try
+                                {
+                                    var personType=int.Parse(cellInfo.Value.ToString())==(int)PersonTypeNum.PersonType.Family?PersonTypeNum.PersonType.Family:
                                         PersonTypeNum.PersonType.Colleague;
-                                excelModel.PersonType.PositionString = info.Value.PositionString;
-                                excelModel.PersonType.Value = personType;
+                                    excel.PersonType.PositionString = model.Value.PositionString;
+                                    excel.PersonType.Value = personType;
+                                }
+                                catch (Exception)
+                                {
+                                    excel.PersonType.PositionString = model.Value.PositionString;
+                                    excel.PersonType.Value = PersonTypeNum.PersonType.Colleague;
+                                }
                                 break;
                             }
                             case PersonTypeNum.ColumnType.Gender:
                             {
-                                excelModel.Gender.PositionString = info.Value.PositionString;
-                                if ((int)cell.Value==(int)PersonTypeNum.Gender.Man)
+                                excel.Gender.PositionString = model.Value.PositionString;
+                                try
                                 {
-                                    excelModel.Gender.Value = PersonTypeNum.Gender.Man;
+                                    if (int.Parse(cellInfo.Value.ToString())==(int)PersonTypeNum.Gender.Man)
+                                    {
+                                        excel.Gender.Value = PersonTypeNum.Gender.Man;
+                                    }
+                                    else
+                                    {
+                                        var gender = int.Parse(cellInfo.Value.ToString())==(int)PersonTypeNum.Gender.Woman ?
+                                            PersonTypeNum.Gender.Woman : PersonTypeNum.Gender.Religious;
+                                        excel.Gender.Value = gender;
+                                    }
                                 }
-                                else
+                                catch (Exception)
                                 {
-                                    var gender = (int)cell.Value==(int)PersonTypeNum.Gender.Woman ?
-                                        PersonTypeNum.Gender.Woman : PersonTypeNum.Gender.Religious;
-                                    excelModel.Gender.Value = gender;
+                                    excel.Gender.Value = PersonTypeNum.Gender.Man;
                                 }
                                 break;
                             }
                             case PersonTypeNum.ColumnType.Text:
                             {
-                                excelModel.Text.PositionString = info.Value.PositionString;
-                                excelModel.Text.Value = cell.Value.ToString();
+                                excel.Text.PositionString = model.Value.PositionString;
+                                excel.Text.Value = cellInfo.Value.ToString();
                                 break;
                             }
                             case PersonTypeNum.ColumnType.Signature:
                             {
-                                excelModel.Signature.PositionString = info.Value.PositionString;
-                                excelModel.Signature.Value = cell.Value.ToString();
+                                excel.Signature.PositionString = model.Value.PositionString;
+                                excel.Signature.Value = cellInfo.Value.ToString();
                                 break;
                             }
                             case PersonTypeNum.ColumnType.Company:
                             {
-                                excelModel.Company.PositionString = info.Value.PositionString;
-                                excelModel.Company.Value = cell.Value.ToString();
+                                excel.Company.PositionString = model.Value.PositionString;
+                                excel.Company.Value = cellInfo.Value.ToString();
                                 break;
                             }
                             case PersonTypeNum.ColumnType.Score:
                             {
-                                excelModel.Score.PositionString = info.Value.PositionString;
-                                excelModel.Score.Value = cell.Value.ToString();
+                                excel.Score.PositionString = model.Value.PositionString;
+                                excel.Score.Value = cellInfo.Value.ToString();
                                 break;
                             }
                         }
                     }
-                    resultList.Add(excelModel);
                 }
+                resultList.Add(excel);
             }
             return resultList;
         }

@@ -14,74 +14,88 @@ namespace CreateWordDocument
         {
             Console.WriteLine("Init...");
             var info = new CollectInfo();
-            var folderPath=info.InteractWithUser("Enter folder of FilesPath(excel and word template)...");
-            var excelName=info.InteractWithUser("Enter Excel file name...");
-            var wordTemplateName=info.InteractWithUser("Enter word template file name...");
-            var nameColumnNumber=int.Parse(info.InteractWithUser("Enter number of Name Column..."));
-            var nameCharInTemplate=info.InteractWithUser("Enter Character of Name string...");
-            var familyColumnNumber=int.Parse(info.InteractWithUser("Enter number of family Column..."));
-            var familyCharInTemplate=info.InteractWithUser("Enter Character of family string...");
-            var personTypeColumnNumber=int.Parse(info.InteractWithUser("Enter number of Column that to define her/him is Family or Colleague..."));
-            var personTypeCharInTemplate=info.InteractWithUser("Enter Character of this PersonType(family/Colleague) string in template...");
-            var genderColumnNumber=int.Parse(info.InteractWithUser("Enter number of Gender Column..."));
-            var genderCharInTemplate=info.InteractWithUser("Enter Character of Gender string...");
-            var companyColumnNumber=int.Parse(info.InteractWithUser("Enter number of Company Column..."));
-            var companyCharInTemplate=info.InteractWithUser("Enter Character of Company string...");
-            var scoreColumnNumber=int.Parse(info.InteractWithUser("Enter number of Score Column..."));
-            var scoreCharInTemplate=info.InteractWithUser("Enter Character of Score string...");
-            var signatureColumnNumber=int.Parse(info.InteractWithUser("Enter number of Signature Column..."));
-            var signatureCharInTemplate=info.InteractWithUser("Enter Character of Signature string...");
-            var textWinsName=info.InteractWithUser("Enter Text boy for wins File Name...");
-            var textParticipantsName=info.InteractWithUser("Enter Text boy for Participants File Name...");
-            var textCharInTemplate=info.InteractWithUser("Enter Character of text string...");
-            
-            var iDictionary = new Dictionary<int, PositionAndTypeModel>
+            //var processInfo = info.CallUser();
+            var processInfo = new ProcessInfoModel
             {
+                FolderPath = @"C:\Users\mohse\Desktop\New_folder",
+                ExcelName = "Book1",
+                WordTemplateName = "Template1",
+                NameColumnNumber = 1,
+                NameCharInTemplate = "name",
+                FamilyColumnNumber = 2,
+                FamilyCharInTemplate = "family",
+                PersonTypeColumnNumber = 3,
+                PersonTypeCharInTemplate = "perType",
+                GenderColumnNumber = 4,
+                GenderCharInTemplate = "gender",
+                CompanyColumnNumber = 5,
+                CompanyCharInTemplate = "comp",
+                ScoreColumnNumber = 6,
+                ScoreCharInTemplate = "score",
+                SignatureColumnNumber = 7,
+                SignatureCharInTemplate = "sign",
+                TextWinsName = "wins",
+                TextParticipantsName = "par",
+                TextCharInTemplate = "text"
+            };
+
+             var iDictionary = new Dictionary<int, PositionAndTypeModel>
+             {
                 {
-                    nameColumnNumber, new PositionAndTypeModel()
+                    processInfo.NameColumnNumber, new PositionAndTypeModel()
                     {
                         ColumnType = PersonTypeNum.ColumnType.Name,
-                        PositionString = nameCharInTemplate
+                        PositionString = processInfo.NameCharInTemplate
                     }
                 },
                 {
-                    familyColumnNumber, new PositionAndTypeModel()
+                    processInfo.FamilyColumnNumber, new PositionAndTypeModel()
                     {
                         ColumnType = PersonTypeNum.ColumnType.Family,
-                        PositionString = familyCharInTemplate
+                        PositionString = processInfo.FamilyCharInTemplate
                     }
                 },
-                { personTypeColumnNumber, new PositionAndTypeModel()
-                {
+                { 
+                    processInfo.PersonTypeColumnNumber, new PositionAndTypeModel()
+                    {
                     ColumnType = PersonTypeNum.ColumnType.PersonType,
-                    PositionString = personTypeCharInTemplate
-                } },
-                { genderColumnNumber, new PositionAndTypeModel()
-                {
+                    PositionString = processInfo.PersonTypeCharInTemplate
+                    }
+                },
+                { 
+                    processInfo.GenderColumnNumber, new PositionAndTypeModel()
+                    {
                     ColumnType = PersonTypeNum.ColumnType.Gender,
-                    PositionString = genderCharInTemplate
-                } },
-                { companyColumnNumber, new PositionAndTypeModel()
-                {
+                    PositionString = processInfo.GenderCharInTemplate
+                    }
+                },
+                { 
+                    processInfo.CompanyColumnNumber, new PositionAndTypeModel()
+                    {
                     ColumnType = PersonTypeNum.ColumnType.Company,
-                    PositionString = companyCharInTemplate
-                } },
-                { scoreColumnNumber, new PositionAndTypeModel()
-                {
+                    PositionString = processInfo.CompanyCharInTemplate
+                    }
+                },
+                { 
+                    processInfo.ScoreColumnNumber, new PositionAndTypeModel()
+                    {
                     ColumnType = PersonTypeNum.ColumnType.Score,
-                    PositionString = scoreCharInTemplate
-                } },
-                { signatureColumnNumber, new PositionAndTypeModel()
-                {
+                    PositionString = processInfo.ScoreCharInTemplate
+                    }
+                },
+                { 
+                    processInfo.SignatureColumnNumber, new PositionAndTypeModel()
+                    {
                     ColumnType = PersonTypeNum.ColumnType.Signature,
-                    PositionString = signatureCharInTemplate
-                } }
+                    PositionString = processInfo.SignatureCharInTemplate
+                    } 
+                }
             };
             IronExcel ironExcel = new IronExcel();
-            var result=ironExcel.ReadStyleSheet(iDictionary,$@"{folderPath}/{excelName}.xlsx");
+            var result2=ironExcel.ReadStyleSheet(iDictionary,$@"{processInfo.FolderPath}/{processInfo.ExcelName}.xlsx");
             ReadTextFile textFile = new ReadTextFile();
-            var bodyWins = textFile.ReadText($@"{folderPath}/{textWinsName}.txt");
-            var bodyPart = textFile.ReadText($@"{folderPath}/{textParticipantsName}.txt");
+            var bodyWins = textFile.ReadText($@"{processInfo.FolderPath}/{processInfo.TextWinsName}.txt");
+            var bodyPart = textFile.ReadText($@"{processInfo.FolderPath}/{processInfo.TextParticipantsName}.txt");
             WordClass wordClass = new WordClass();
             string documentFolder= @"C:\Users\mohse\Desktop\New_folder\{0}";
             wordClass.FindAndReplace(string.Format(documentFolder,"Template1.docx"),"family","احمد نصیری",string.Format(documentFolder,"TemplateResult.docx"));

@@ -110,6 +110,7 @@
     <Compile Include="Models\CharAndTypeModel.cs" />
     <Compile Include="Models\ExcelModel.cs" />
     <Compile Include="Models\PersonTypeNum.cs" />
+    <Compile Include="Models\ProcessInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WordGenerator.cs" />
