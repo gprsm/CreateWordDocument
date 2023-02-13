@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CreateWordDocument.Helper;
 using CreateWordDocument.Models;
 using DocumentFormat.OpenXml.Packaging;
 using InaOfficeTools;
@@ -15,34 +16,70 @@ namespace CreateWordDocument
         static void Main(string[] args)
         {
             Console.WriteLine("Init...");
-            Console.WriteLine("Enter Excel File path?");
-            var excelPath = Console.ReadLine();
-            while (string.IsNullOrEmpty(excelPath))
-            {
-                Console.WriteLine("inter Excel File path?");
-                excelPath = Console.ReadLine();
-            }
-
-            var iDictionary = new Dictionary<int, PersonTypeNum.ColumnType>();
-            Console.WriteLine("Enter name column Number...(begin from 0)");
-            var nameColumnNumber = Console.ReadLine();
-            while (string.IsNullOrEmpty(nameColumnNumber))
-            {
-                Console.WriteLine("Enter name column Number .....");
-                nameColumnNumber = Console.ReadLine();
-            }
-            Console.WriteLine("Enter Family column Number .....");
-            var familyColumnNumber = Console.ReadLine();
-            while (string.IsNullOrEmpty(familyColumnNumber))
-            {
-                Console.WriteLine("Enter Family column Number .....");
-                familyColumnNumber = Console.ReadLine();
-            }
-            iDictionary.Add(int.Parse(nameColumnNumber),PersonTypeNum.ColumnType.Name);
-            iDictionary.Add(int.Parse(familyColumnNumber),PersonTypeNum.ColumnType.Family);
+            CollectInfo info = new CollectInfo();
+            var excelPath=info.InteractWithUser("Enter Excel FilePath...");
+            var nameColumnNumber=int.Parse(info.InteractWithUser("Enter number of Name Column..."));
+            var nameCharInTemplate=info.InteractWithUser("Enter Character of Name string...");
+            var familyColumnNumber=int.Parse(info.InteractWithUser("Enter number of family Column..."));
+            var familyCharInTemplate=info.InteractWithUser("Enter Character of family string...");
+            var personTypeColumnNumber=int.Parse(info.InteractWithUser("Enter number of Column that to define her/him is Family or Colleague..."));
+            var personTypeCharInTemplate=info.InteractWithUser("Enter Character of this PersonType(family/Colleague) string in template...");
+            var genderColumnNumber=int.Parse(info.InteractWithUser("Enter number of Gender Column..."));
+            var genderCharInTemplate=info.InteractWithUser("Enter Character of Gender string...");
+            var companyColumnNumber=int.Parse(info.InteractWithUser("Enter number of Company Column..."));
+            var companyCharInTemplate=info.InteractWithUser("Enter Character of Company string...");
+            var scoreColumnNumber=int.Parse(info.InteractWithUser("Enter number of Score Column..."));
+            var scoreCharInTemplate=info.InteractWithUser("Enter Character of Score string...");
+            var signatureColumnNumber=int.Parse(info.InteractWithUser("Enter number of Signature Column..."));
+            var signatureCharInTemplate=info.InteractWithUser("Enter Character of Signature string...");
+            var textWinsPath=info.InteractWithUser("Enter Text boy for wins FilePath...");
+            var textParticipantsPath=info.InteractWithUser("Enter Text boy for Participants FilePath...");
+            var textCharInTemplate=info.InteractWithUser("Enter Character of text string...");
             
-            IroxExcel iroxExcel = new IroxExcel();
-            iroxExcel.ReadStyleSheet(iDictionary,excelPath);
+            var iDictionary = new Dictionary<int, PositionAndTypeModel>
+            {
+                {
+                    nameColumnNumber, new PositionAndTypeModel()
+                    {
+                        ColumnType = PersonTypeNum.ColumnType.Name,
+                        PositionString = nameCharInTemplate
+                    }
+                },
+                {
+                    familyColumnNumber, new PositionAndTypeModel()
+                    {
+                        ColumnType = PersonTypeNum.ColumnType.Family,
+                        PositionString = familyCharInTemplate
+                    }
+                },
+                { personTypeColumnNumber, new PositionAndTypeModel()
+                {
+                    ColumnType = PersonTypeNum.ColumnType.PersonType,
+                    PositionString = personTypeCharInTemplate
+                } },
+                { genderColumnNumber, new PositionAndTypeModel()
+                {
+                    ColumnType = PersonTypeNum.ColumnType.Gender,
+                    PositionString = genderCharInTemplate
+                } },
+                { companyColumnNumber, new PositionAndTypeModel()
+                {
+                    ColumnType = PersonTypeNum.ColumnType.Company,
+                    PositionString = companyCharInTemplate
+                } },
+                { scoreColumnNumber, new PositionAndTypeModel()
+                {
+                    ColumnType = PersonTypeNum.ColumnType.Score,
+                    PositionString = scoreCharInTemplate
+                } },
+                { signatureColumnNumber, new PositionAndTypeModel()
+                {
+                    ColumnType = PersonTypeNum.ColumnType.Signature,
+                    PositionString = signatureCharInTemplate
+                } }
+            };
+            IronExcel ironExcel = new IronExcel();
+            var result=ironExcel.ReadStyleSheet(iDictionary,excelPath);
             
             WordClass wordClass = new WordClass();
             string documentFolder= @"C:\Users\mohse\Desktop\New_folder\{0}";

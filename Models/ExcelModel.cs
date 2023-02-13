@@ -1,13 +1,16 @@
-﻿namespace CreateWordDocument.Models
+﻿using System.Collections.Generic;
+
+namespace CreateWordDocument.Models
 {
     public class ExcelModel
     {
-        public string NameAndFamily { get; set; }
-        public string Company { get; set; }
-        public PersonTypeNum.PersonType PersonType { get; set; }
-        public PersonTypeNum.Gender Gender { get; set; }
-        public string Text { get; set; }
-        public string Signature { get; set; }
-        public string Score { get; set; }
+        public IDictionary<string,string> Name { get; set; }
+        public IDictionary<string,string> Family { get; set; }
+        public IDictionary<string,string> Company { get; set; }
+        public IDictionary<string,PersonTypeNum.PersonType> PersonType { get; set; }
+        public IDictionary<string,PersonTypeNum.Gender> Gender { get; set; }
+        public IDictionary<string,string> Text { get; set; }
+        public IDictionary<string,string> Signature { get; set; }
+        public IDictionary<string,string> Score { get; set; }
     }
 }

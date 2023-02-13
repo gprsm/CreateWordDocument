@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Office.Interop.Word;
-namespace CreateWordDocument
+
+namespace CreateWordDocument.Helper
 {
     public class WordClass
     {

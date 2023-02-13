@@ -2,16 +2,17 @@
 using System.Linq;
 using CreateWordDocument.Models;
 using IronXL;
-namespace CreateWordDocument
+
+namespace CreateWordDocument.Helper
 {
-    public class IroxExcel
+    public class IronExcel
     {
-        public List<ExcelModel> ReadStyleSheet(IDictionary<int,PersonTypeNum.ColumnType> columnsNumber,string xmlPath)
+        public List<ExcelModel> ReadStyleSheet(IDictionary<int,PositionAndTypeModel> columnsInfo,string xmlPath)
         {
             var resultList = new List<ExcelModel>();
             WorkBook workBook = WorkBook.Load(xmlPath);
             WorkSheet workSheet = workBook.WorkSheets.First();
-            foreach (var number in columnsNumber)
+            foreach (var info in columnsInfo)
             {
                 foreach (var totalRow in workSheet.Rows)
                 {
@@ -19,58 +20,59 @@ namespace CreateWordDocument
                     foreach (var cell in 
                              totalRow.ToList().Where(cell => 
                                  !string.IsNullOrEmpty(cell.Text)).
-                                 Where(cell => cell.ColumnIndex==number.Key))
+                                 Where(cell => cell.ColumnIndex==info.Key))
                     {
-                        switch (number.Value)
+                        switch (info.Value.ColumnType)
                         {
                             case PersonTypeNum.ColumnType.Name:
                             {
-                                excelModel.NameAndFamily = cell.Value.ToString();
+                                excelModel.Name.Add(info.Value.PositionString,cell.Value.ToString()); 
                                 break;
                             }
                             case PersonTypeNum.ColumnType.Family:
                             {
-                                excelModel.NameAndFamily += " "+cell.Value.ToString();
+                                
                                 break;
                             }
                             case PersonTypeNum.ColumnType.PersonType:
                             {
-                                excelModel.PersonType = 
-                                    (string)cell.Value=="1"?PersonTypeNum.PersonType.Colleague:
-                                        PersonTypeNum.PersonType.Family;
+                                var personTypeNum=(int)cell.Value==(int)PersonTypeNum.PersonType.Family?PersonTypeNum.PersonType.Family:
+                                        PersonTypeNum.PersonType.Colleague;
+                                excelModel.PersonType.Add(info.Value.PositionString,personTypeNum); 
                                 break;
                             }
                             case PersonTypeNum.ColumnType.Gender:
                             {
                                 if ((int)cell.Value==(int)PersonTypeNum.Gender.Man)
                                 {
-                                    excelModel.Gender = PersonTypeNum.Gender.Man;
+                                    excelModel.Gender.Add(info.Value.PositionString,PersonTypeNum.Gender.Man);
                                 }
                                 else
                                 {
-                                    excelModel.Gender = (int)cell.Value==(int)PersonTypeNum.Gender.Woman ?
+                                    var gender = (int)cell.Value==(int)PersonTypeNum.Gender.Woman ?
                                         PersonTypeNum.Gender.Woman : PersonTypeNum.Gender.Religious;
+                                    excelModel.Gender.Add(info.Value.PositionString,gender);
                                 }
                                 break;
                             }
                             case PersonTypeNum.ColumnType.Text:
                             {
-                                excelModel.Text = (string)cell.Value;
+                                excelModel.Text.Add(info.Value.PositionString,(string)cell.Value);
                                 break;
                             }
                             case PersonTypeNum.ColumnType.Signature:
                             {
-                                excelModel.Signature = (string)cell.Value;
+                                excelModel.Signature.Add(info.Value.PositionString,(string)cell.Value);
                                 break;
                             }
                             case PersonTypeNum.ColumnType.Company:
                             {
-                                excelModel.Company = (string)cell.Value;
+                                excelModel.Company.Add(info.Value.PositionString,(string)cell.Value);
                                 break;
                             }
                             case PersonTypeNum.ColumnType.Score:
                             {
-                                excelModel.Score = (string)cell.Value;
+                                excelModel.Score.Add(info.Value.PositionString,(string)cell.Value);
                                 break;
                             }
                         }

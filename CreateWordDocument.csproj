@@ -103,21 +103,21 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IroxExcel.cs" />
+    <Compile Include="Helper\CollectInfo.cs" />
+    <Compile Include="Helper\IroxExcel.cs" />
+    <Compile Include="Helper\ReadTextFile.cs" />
+    <Compile Include="Helper\WordClass.cs" />
+    <Compile Include="Models\CharAndTypeModel.cs" />
     <Compile Include="Models\ExcelModel.cs" />
     <Compile Include="Models\PersonTypeNum.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WordClass.cs" />
     <Compile Include="WordGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="SampleWordTemplate\Template1.docx" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Helper" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
