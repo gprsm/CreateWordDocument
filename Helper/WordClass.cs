@@ -9,7 +9,7 @@ namespace CreateWordDocument.Helper
     public class WordClass
     {
         public void ProcessInputs(List<ExcelModel> excelInputs, string templatePath, string textWins,
-            string textPar)
+            string textPar,string folderPath)
         {
             if (!File.Exists(templatePath))
             {
@@ -24,12 +24,50 @@ namespace CreateWordDocument.Helper
             foreach (var excelInput in excelInputs)
             {
                 //برای هر فرد
+                var name = "";
+                var family = "";
                 foreach (var model in excelInput.Models)
                 {
+                    if (model.Type == PersonTypeNum.ColumnType.Name)
+                    {
+                        name = model.Value;
+                    }
+
+                    if (model.Type==PersonTypeNum.ColumnType.Family)
+                    {
+                        family = model.Value;
+                    }
+                    if (!string.IsNullOrEmpty(textWins) && model.Type==PersonTypeNum.ColumnType.Text)
+                    {
+                        var place = textWins.IndexOf(model.PositionString, StringComparison.Ordinal);
+                        var result = textWins.Remove(place, model.PositionString.Length).Insert(place, model.Value);
+                        model.Value = result;
+                    }
+                    if (!string.IsNullOrEmpty(textPar) && model.Type==PersonTypeNum.ColumnType.Text)
+                    {
+                        var place = textPar.IndexOf(model.PositionString, StringComparison.Ordinal);
+                        var result = textPar.Remove(place, model.PositionString.Length).Insert(place, model.Value);
+                        model.Value = result;
+                    }
                     SearchTextBox(fileOpen, model.PositionString, model.Value);
-                    
                 }
+
+                var resPath = $@"{folderPath}/{name}_{family}.docx";
+                document.SaveAs2(resPath);
+                object outputFileName = resPath.Replace(".docx", ".pdf");
+                var pdfPath =outputFileName;
+                object fileFormat = WdSaveFormat.wdFormatPDF;
+                document.SaveAs( pdfPath,
+                    ref fileFormat, ref oMissing, ref oMissing,
+                    ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                    ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                    ref oMissing, ref oMissing, ref oMissing, ref oMissing);
             }
+            object saveChanges = WdSaveOptions.wdDoNotSaveChanges;
+            ((_Document)document).Close(ref saveChanges, ref oMissing, ref oMissing);
+            document = null;
+            //Close the file out
+            fileOpen.Quit();
         }
         public void FindAndReplace(string path,string textToR,string replace,string resPath)
         {
