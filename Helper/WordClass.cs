@@ -23,7 +23,12 @@ namespace CreateWordDocument.Helper
             fileOpen.Visible = false;
             foreach (var excelInput in excelInputs)
             {
-                
+                //برای هر فرد
+                foreach (var model in excelInput.Models)
+                {
+                    SearchTextBox(fileOpen, model.PositionString, model.Value);
+                    
+                }
             }
         }
         public void FindAndReplace(string path,string textToR,string replace,string resPath)
