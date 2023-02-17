@@ -11,6 +11,7 @@ namespace CreateWordDocument.Helper
         public void ProcessInputs(List<ExcelModel> excelInputs, string templatePath, string textWins,
             string textPar,string folderPath)
         {
+            var edited = false;
             if (!File.Exists(templatePath))
             {
                 var info = new CollectInfo();
@@ -19,6 +20,8 @@ namespace CreateWordDocument.Helper
             object oMissing = System.Reflection.Missing.Value;
             Application fileOpen = new Application();
             Document document = fileOpen.Documents.Open(templatePath,ReadOnly:false);
+            CreateDirectory createDirectory = new CreateDirectory();
+            createDirectory.CreateSubDirectory(folderPath, "result");
             //Make the file visible 
             fileOpen.Visible = false;
             foreach (var excelInput in excelInputs)
@@ -26,42 +29,113 @@ namespace CreateWordDocument.Helper
                 //برای هر فرد
                 var name = "";
                 var family = "";
+                var editedDoc = new Document();
                 foreach (var model in excelInput.Models)
                 {
-                    if (model.Type == PersonTypeNum.ColumnType.Name)
+                    var body = textPar;
+                    if (!string.IsNullOrEmpty(model.Value))
                     {
-                        name = model.Value;
+                        switch (model.Type)
+                        {
+                            case PersonTypeNum.ColumnType.Name:
+                            {
+                                name = model.Value;
+                                break;
+                            }
+                            case PersonTypeNum.ColumnType.Family:
+                            {
+                                family = model.Value;
+                                break;
+                            }
+                            case PersonTypeNum.ColumnType.Score:
+                            {
+                                if (!string.IsNullOrEmpty(textWins))
+                                {
+                                    var place = textWins.IndexOf(model.PositionString, StringComparison.Ordinal);
+                                    if (place>0)
+                                    {
+                                        var result = textWins.Remove(place, model.PositionString.Length).Insert(place, model.Value);
+                                        body = result;
+                                    }
+                                }
+                                break;
+                            }
+                            case PersonTypeNum.ColumnType.Gender:
+                            {
+                                if (model.Value== "مرد"|| model.Value=="مذکر"||
+                                    model.Value=="1" ||
+                                    model.Value=="پسر")
+                                {
+                                    editedDoc=SearchTextBox(document, model.PositionString, "جناب آقای");
+                                    edited = true;
+                                }
+
+                                if (model.Value== "زن"|| model.Value=="مونث"||
+                                    model.Value=="2" ||
+                                    model.Value=="دختر")
+                                {
+                                    editedDoc=SearchTextBox(document, model.PositionString, "سرکار خانم");
+                                    edited = true;
+                                }
+
+                                if (model.Value.Contains("الاسلام") || model.Value=="3")
+                                {
+                                    editedDoc=SearchTextBox(document, model.PositionString, "حجت الاسلام و المسلمین");
+                                    edited = true;
+                                }
+                                break;
+                            }
+                            case PersonTypeNum.ColumnType.PersonType:
+                            {
+                                var textString = "";
+                                if (model.Value==PersonTypeNum.PersonType.Colleague.ToString() ||
+                                    model.Value.Contains("اصلی")|| model.Value.Contains("همکار"))
+                                {
+                                    textString = "همکار محترم";
+                                }
+                                editedDoc=SearchTextBox(document, model.PositionString,
+                                    textString);
+
+                                edited = true;
+                                break;
+                            }
+                            case PersonTypeNum.ColumnType.Text:
+                            {
+                                editedDoc=SearchTextBox(document, model.PositionString,
+                                    body);
+
+                                edited = true;
+                                break;
+                            }
+                        }
                     }
 
-                    if (model.Type==PersonTypeNum.ColumnType.Family)
+                    if (!edited)
                     {
-                        family = model.Value;
+                        editedDoc=SearchTextBox(document, model.PositionString, model.Value);
                     }
-                    if (!string.IsNullOrEmpty(textWins) && model.Type==PersonTypeNum.ColumnType.Text)
-                    {
-                        var place = textWins.IndexOf(model.PositionString, StringComparison.Ordinal);
-                        var result = textWins.Remove(place, model.PositionString.Length).Insert(place, model.Value);
-                        model.Value = result;
-                    }
-                    if (!string.IsNullOrEmpty(textPar) && model.Type==PersonTypeNum.ColumnType.Text)
-                    {
-                        var place = textPar.IndexOf(model.PositionString, StringComparison.Ordinal);
-                        var result = textPar.Remove(place, model.PositionString.Length).Insert(place, model.Value);
-                        model.Value = result;
-                    }
-                    SearchTextBox(fileOpen, model.PositionString, model.Value);
+                    edited = false;
                 }
 
-                var resPath = $@"{folderPath}/{name}_{family}.docx";
-                document.SaveAs2(resPath);
-                object outputFileName = resPath.Replace(".docx", ".pdf");
-                var pdfPath =outputFileName;
-                object fileFormat = WdSaveFormat.wdFormatPDF;
-                document.SaveAs( pdfPath,
-                    ref fileFormat, ref oMissing, ref oMissing,
-                    ref oMissing, ref oMissing, ref oMissing, ref oMissing,
-                    ref oMissing, ref oMissing, ref oMissing, ref oMissing,
-                    ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+                
+                var resPath = $@"{folderPath}\result\{name}_{family}.docx";
+                try
+                {
+                    editedDoc.SaveAs2(resPath);
+                    object outputFileName = resPath.Replace(".docx", ".pdf");
+                    var pdfPath =outputFileName;
+                    object fileFormat = WdSaveFormat.wdFormatPDF;
+                    document.SaveAs( pdfPath,
+                        ref fileFormat, ref oMissing, ref oMissing,
+                        ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                        ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                        ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+                
             }
             object saveChanges = WdSaveOptions.wdDoNotSaveChanges;
             ((_Document)document).Close(ref saveChanges, ref oMissing, ref oMissing);
@@ -84,7 +158,7 @@ namespace CreateWordDocument.Helper
             //new text with the same exact formmating (e.g red bold text will be replaced with red bold text)
             //FindAndReplace(fileOpen, textToR, replace);
             //SearchReplace(fileOpen, textToR, replace);
-            SearchTextBox(fileOpen, textToR, replace);
+            SearchTextBox(document, textToR, replace);
             //Save the editted file in a specified location
             //Can use SaveAs instead of SaveAs2 and just give it a name to have it saved by default
             //to the documents folder
@@ -138,22 +212,19 @@ namespace CreateWordDocument.Helper
             object replaceAll = WdReplace.wdReplaceAll;
             findObject.Execute(oMissing,oMissing,oMissing,oMissing,oMissing,oMissing,oMissing,Replace: ref replaceAll);
         }
-        private void SearchTextBox(Application fileOpen,string name,string newContent)
+        private Document SearchTextBox(Document doc,string name,string newContent)
         {
-            var a = fileOpen.Documents;
-            foreach (Document b in a)
-            {
-                foreach (Shape shape in b.Shapes)
-                    if (shape.Name.Contains("Text Box"))
+            foreach (Shape shape in doc.Shapes)
+                if (shape.Name.Contains("Text Box"))
+                {
+                    if (shape.TextFrame.ContainingRange.Text.Contains(name))
                     {
-                        if (shape.TextFrame.ContainingRange.Text.Contains(name))
-                        {
-                            shape.TextFrame.ContainingRange.Text = newContent;
-                            return;
-                        }
-                        
+                        shape.TextFrame.ContainingRange.Text = newContent;
                     }
-            }
+                        
+                }
+
+            return doc;
         }
     }
 }

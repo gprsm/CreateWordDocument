@@ -104,6 +104,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helper\CollectInfo.cs" />
+    <Compile Include="Helper\CreateDirectory.cs" />
     <Compile Include="Helper\IroxExcel.cs" />
     <Compile Include="Helper\ReadTextFile.cs" />
     <Compile Include="Helper\WordClass.cs" />
