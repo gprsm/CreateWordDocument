@@ -104,7 +104,7 @@ namespace CreateWordDocument
             var bodyWins = textFile.ReadText($@"{processInfo.FolderPath}/{processInfo.TextWinsName}.txt");
             var bodyPart = textFile.ReadText($@"{processInfo.FolderPath}/{processInfo.TextParticipantsName}.txt");
             WordClass wordClass = new WordClass();
-            wordClass.ProcessInputs(result,$@"{processInfo.FolderPath}/{processInfo.WordTemplateName}.docx",bodyWins,bodyPart,$@"{processInfo.FolderPath}");
+            wordClass.StartProcess(result,$@"{processInfo.FolderPath}/{processInfo.WordTemplateName}.docx",bodyWins,bodyPart,$@"{processInfo.FolderPath}");
 
             Console.WriteLine("Finish...");
         }

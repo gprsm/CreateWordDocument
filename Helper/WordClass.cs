@@ -8,7 +8,18 @@ namespace CreateWordDocument.Helper
 {
     public class WordClass
     {
-        public void ProcessInputs(List<ExcelModel> excelInputs, string templatePath, string textWins,
+        public void StartProcess(List<ExcelModel> excelInputs, string templatePath, string textWins,
+            string textPar, string folderPath)
+        {
+            var counter = excelInputs.Count;
+            foreach (var input in excelInputs)
+            {
+                ProcessInputs(input,templatePath,textWins,textPar,folderPath);
+                --counter;
+                Console.Write(counter/100);
+            }
+        }
+        private void ProcessInputs(ExcelModel excelInput, string templatePath, string textWins,
             string textPar,string folderPath)
         {
             var edited = false;
@@ -24,9 +35,7 @@ namespace CreateWordDocument.Helper
             createDirectory.CreateSubDirectory(folderPath, "result");
             //Make the file visible 
             fileOpen.Visible = false;
-            foreach (var excelInput in excelInputs)
-            {
-                //برای هر فرد
+             //برای هر فرد
                 var name = "";
                 var family = "";
                 var editedDoc = new Document();
@@ -135,8 +144,6 @@ namespace CreateWordDocument.Helper
                 {
                     Console.WriteLine(e);
                 }
-                
-            }
             object saveChanges = WdSaveOptions.wdDoNotSaveChanges;
             ((_Document)document).Close(ref saveChanges, ref oMissing, ref oMissing);
             document = null;
