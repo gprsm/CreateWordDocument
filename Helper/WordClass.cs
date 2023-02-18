@@ -102,8 +102,12 @@ namespace CreateWordDocument.Helper
             if (!string.IsNullOrEmpty(personTypeString))
             {
                 SearchTextBox(document, personTypePositionString, $"{personTypeString} {companyStr}");
-            }
-            
+            }   
+            var signatureValue=excelInput.Models.FirstOrDefault(x => x.Type ==
+                                                                     PersonTypeNum.ColumnType.Signature)?.Value;
+            var signaturePositionString=excelInput.Models.FirstOrDefault(x => x.Type ==
+                                                                     PersonTypeNum.ColumnType.Signature)?.PositionString;
+            SearchTextBox(document, signaturePositionString, $"{signatureValue}");
             var resPath = $@"{folderPath}\result\{name} {family}.docx";
                 try
                 {
