@@ -1,10 +1,7 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
 using CreateWordDocument.Helper;
 using CreateWordDocument.Models;
-using DocumentFormat.OpenXml.Packaging;
-using InaOfficeTools;
 
 namespace CreateWordDocument
 {
