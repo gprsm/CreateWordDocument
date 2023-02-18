@@ -69,7 +69,8 @@ namespace CreateWordDocument.Helper
                 personTitle = "حجت الاسلام و مسلمین";
             }
 
-            SearchTextBox(document, genderPositionString,$"{personTitle} {name} {family}");
+            SearchTextBox(document, genderPositionString,
+                string.IsNullOrEmpty(genderValue) ? $"{name} {family}" : $"{personTitle} {name} {family}");
 
 
             //بخش نوشتار اصلی و امتیازات
@@ -79,13 +80,18 @@ namespace CreateWordDocument.Helper
                                                             PersonTypeNum.ColumnType.Score)?.Value;
             var scorePositionString=excelInput.Models.FirstOrDefault(x => x.Type ==
                                                                  PersonTypeNum.ColumnType.Score)?.PositionString;
-            if (!string.IsNullOrEmpty(scoreValue) && !string.IsNullOrEmpty(textWins) && scorePositionString != null)
+            if (!string.IsNullOrEmpty(scoreValue) &&
+                !string.IsNullOrEmpty(textWins) && scorePositionString != null)
             {
                 var place = textWins.IndexOf(scorePositionString, StringComparison.Ordinal);
                 var textBody = place>0 ? textWins.Remove(place, scorePositionString.Length).Insert(place, scoreValue) : textPar;
                 SearchTextBox(document, textPosition, textBody);
             }
-            //بخش عنوان کاری
+            else
+            {
+                SearchTextBox(document, textPosition, textPar);
+            }
+                //بخش عنوان کاری
             
             var personType=excelInput.Models.FirstOrDefault(x => x.Type ==
                                                                  PersonTypeNum.ColumnType.PersonType)?.Value;
@@ -103,6 +109,7 @@ namespace CreateWordDocument.Helper
             {
                 SearchTextBox(document, personTypePositionString, $"{personTypeString} {companyStr}");
             }   
+            //Signature
             var signatureValue=excelInput.Models.FirstOrDefault(x => x.Type ==
                                                                      PersonTypeNum.ColumnType.Signature)?.Value;
             var signaturePositionString=excelInput.Models.FirstOrDefault(x => x.Type ==
