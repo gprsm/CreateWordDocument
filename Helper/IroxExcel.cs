@@ -29,6 +29,7 @@ namespace CreateWordDocument.Helper
                 foreach (var model in columnsInfo)
                 {
                     var cellInfo = sheetRow.FirstOrDefault(x => x.ColumnIndex == model.Key);
+                    
                     if (cellInfo?.Value!=null)
                     {
                         excel.Models.Add(new DefinedValue<string>()

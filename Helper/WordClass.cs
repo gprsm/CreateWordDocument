@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CreateWordDocument.Models;
 using Microsoft.Office.Interop.Word;
 
@@ -16,7 +17,7 @@ namespace CreateWordDocument.Helper
             {
                 ProcessInputs(input,templatePath,textWins,textPar,folderPath);
                 --counter;
-                Console.Write(counter/100);
+                Console.Write(counter);
             }
         }
         private void ProcessInputs(ExcelModel excelInput, string templatePath, string textWins,
@@ -29,108 +30,84 @@ namespace CreateWordDocument.Helper
                 templatePath=info.InteractWithUser("template not Found. enter full word file path again(example 'c:/template.docx')...");
             }
             object oMissing = System.Reflection.Missing.Value;
-            Application fileOpen = new Application();
-            Document document = fileOpen.Documents.Open(templatePath,ReadOnly:false);
-            CreateDirectory createDirectory = new CreateDirectory();
+            var fileOpen = new Application();
+            var document = fileOpen.Documents.Open(templatePath,ReadOnly:false);
+            var createDirectory = new CreateDirectory();
             createDirectory.CreateSubDirectory(folderPath, "result");
             //Make the file visible 
             fileOpen.Visible = false;
-             //برای هر فرد
-                var name = "";
-                var family = "";
-                var editedDoc = new Document();
-                foreach (var model in excelInput.Models)
-                {
-                    var body = textPar;
-                    if (!string.IsNullOrEmpty(model.Value))
-                    {
-                        switch (model.Type)
-                        {
-                            case PersonTypeNum.ColumnType.Name:
-                            {
-                                name = model.Value;
-                                break;
-                            }
-                            case PersonTypeNum.ColumnType.Family:
-                            {
-                                family = model.Value;
-                                break;
-                            }
-                            case PersonTypeNum.ColumnType.Score:
-                            {
-                                if (!string.IsNullOrEmpty(textWins))
-                                {
-                                    var place = textWins.IndexOf(model.PositionString, StringComparison.Ordinal);
-                                    if (place>0)
-                                    {
-                                        var result = textWins.Remove(place, model.PositionString.Length).Insert(place, model.Value);
-                                        body = result;
-                                    }
-                                }
-                                break;
-                            }
-                            case PersonTypeNum.ColumnType.Gender:
-                            {
-                                if (model.Value== "مرد"|| model.Value=="مذکر"||
-                                    model.Value=="1" ||
-                                    model.Value=="پسر")
-                                {
-                                    editedDoc=SearchTextBox(document, model.PositionString, "جناب آقای");
-                                    edited = true;
-                                }
+            
+            //   بخش نام و نام خانوادگی و عنوان
+            var name =excelInput.Models.FirstOrDefault(x => x.Type ==
+                                                            PersonTypeNum.ColumnType.Name)?.Value;
+            var family =excelInput.Models.FirstOrDefault(x => x.Type ==
+                                                              PersonTypeNum.ColumnType.Family)?.Value;
+            var genderValue=excelInput.Models.FirstOrDefault(x => x.Type ==
+                                                                  PersonTypeNum.ColumnType.Gender)?.Value;
+            var genderPositionString=excelInput.Models.FirstOrDefault(x => x.Type ==
+                                                                           PersonTypeNum.ColumnType.Gender)?.PositionString;
+            
+            var personTitle = string.Empty;
+            switch (genderValue)
+            {
+                case "مرد":
+                case "مذکر":
+                case "1":
+                case "پسر":
+                    personTitle = "جناب آقای";
+                    break;
+                case "زن":
+                case "مونث":
+                case "2":
+                case "دختر":
+                    personTitle = "سرکار خانم";
+                    break;
+            }
 
-                                if (model.Value== "زن"|| model.Value=="مونث"||
-                                    model.Value=="2" ||
-                                    model.Value=="دختر")
-                                {
-                                    editedDoc=SearchTextBox(document, model.PositionString, "سرکار خانم");
-                                    edited = true;
-                                }
+            if (genderValue!=null && genderValue.Contains("الاسلام") || genderValue=="3")
+            {
+                personTitle = "حجت الاسلام و مسلمین";
+            }
 
-                                if (model.Value.Contains("الاسلام") || model.Value=="3")
-                                {
-                                    editedDoc=SearchTextBox(document, model.PositionString, "حجت الاسلام و المسلمین");
-                                    edited = true;
-                                }
-                                break;
-                            }
-                            case PersonTypeNum.ColumnType.PersonType:
-                            {
-                                var textString = "";
-                                if (model.Value==PersonTypeNum.PersonType.Colleague.ToString() ||
-                                    model.Value.Contains("اصلی")|| model.Value.Contains("همکار"))
-                                {
-                                    textString = "همکار محترم";
-                                }
-                                editedDoc=SearchTextBox(document, model.PositionString,
-                                    textString);
+            SearchTextBox(document, genderPositionString,$"{personTitle} {name} {family}");
 
-                                edited = true;
-                                break;
-                            }
-                            case PersonTypeNum.ColumnType.Text:
-                            {
-                                editedDoc=SearchTextBox(document, model.PositionString,
-                                    body);
 
-                                edited = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (!edited)
-                    {
-                        editedDoc=SearchTextBox(document, model.PositionString, model.Value);
-                    }
-                    edited = false;
-                }
-
-                
-                var resPath = $@"{folderPath}\result\{name}_{family}.docx";
+            //بخش نوشتار اصلی و امتیازات
+            var textPosition=excelInput.Models.FirstOrDefault(x => x.Type ==
+                                                                   PersonTypeNum.ColumnType.Text)?.PositionString;
+            var scoreValue=excelInput.Models.FirstOrDefault(x => x.Type ==
+                                                            PersonTypeNum.ColumnType.Score)?.Value;
+            var scorePositionString=excelInput.Models.FirstOrDefault(x => x.Type ==
+                                                                 PersonTypeNum.ColumnType.Score)?.PositionString;
+            if (!string.IsNullOrEmpty(scoreValue) && !string.IsNullOrEmpty(textWins) && scorePositionString != null)
+            {
+                var place = textWins.IndexOf(scorePositionString, StringComparison.Ordinal);
+                var textBody = place>0 ? textWins.Remove(place, scorePositionString.Length).Insert(place, scoreValue) : textPar;
+                SearchTextBox(document, textPosition, textBody);
+            }
+            //بخش عنوان کاری
+            
+            var personType=excelInput.Models.FirstOrDefault(x => x.Type ==
+                                                                 PersonTypeNum.ColumnType.PersonType)?.Value;
+            var personTypePositionString=excelInput.Models.FirstOrDefault(x => x.Type ==
+                                                                               PersonTypeNum.ColumnType.PersonType)?.PositionString;
+            var personTypeString=String.Empty;
+            if (personType=="2" ||
+                personType.Contains("اصلی")|| personType.Contains("همکار"))
+            {
+                personTypeString = "همکار محترم";
+            }
+            var companyStr = excelInput.Models.FirstOrDefault(x => x.Type ==
+                                                                   PersonTypeNum.ColumnType.Company)?.Value;
+            if (!string.IsNullOrEmpty(personTypeString))
+            {
+                SearchTextBox(document, personTypePositionString, $"{personTypeString} {companyStr}");
+            }
+            
+            var resPath = $@"{folderPath}\result\{name} {family}.docx";
                 try
                 {
-                    editedDoc.SaveAs2(resPath);
+                    document.SaveAs2(resPath);
                     object outputFileName = resPath.Replace(".docx", ".pdf");
                     var pdfPath =outputFileName;
                     object fileFormat = WdSaveFormat.wdFormatPDF;
