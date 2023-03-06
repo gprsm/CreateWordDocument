@@ -11,7 +11,8 @@
         {
             Man=1,
             Woman=2,
-            Religious=3
+            Religious=3,
+            Children=4
         }
         public enum ColumnType
         {

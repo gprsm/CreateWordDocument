@@ -49,7 +49,7 @@
       <HintPath>packages\IronSoftware.System.Drawing.2023.1.11379\lib\netstandard2.0\IronSoftware.Drawing.Common.dll</HintPath>
     </Reference>
     <Reference Include="IronXL">
-      <HintPath>..\..\..\..\Desktop\IronXL_2019.5_Downloadly.ir\IronXL 2019.5\net45\IronXL.dll</HintPath>
+      <HintPath>..\..\Desktop\EditWordFileUsingCsharp-main\EditWordFileUsingCsharp-main\bin\Debug\IronXL.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=2.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Extensions.Logging.Abstractions.2.1.0\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>

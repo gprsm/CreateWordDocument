@@ -53,14 +53,17 @@ namespace CreateWordDocument.Helper
                 case "مرد":
                 case "مذکر":
                 case "1":
-                case "پسر":
                     personTitle = "جناب آقای";
                     break;
                 case "زن":
                 case "مونث":
                 case "2":
-                case "دختر":
                     personTitle = "سرکار خانم";
+                    break;
+                case "پسر":
+                case "4":
+                case "دختر":
+                    personTitle = "فرزند عزیزم";
                     break;
             }
 

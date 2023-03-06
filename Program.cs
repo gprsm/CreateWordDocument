@@ -14,9 +14,9 @@ namespace CreateWordDocument
             //var processInfo = info.CallUser();
             var processInfo = new ProcessInfoModel
             {
-                FolderPath = @"C:\Users\mohse\Desktop\New_folder",
-                ExcelName = "Book1",
-                WordTemplateName = "doc1",
+                FolderPath = @"C:\Users\akhoondian\Desktop\jASHNtAKLIF",
+                ExcelName = "detersJashnTaklif",
+                WordTemplateName = "Doc2",
                 NameColumnNumber = 1,
                 NameCharInTemplate = "name",
                 FamilyColumnNumber = 2,
